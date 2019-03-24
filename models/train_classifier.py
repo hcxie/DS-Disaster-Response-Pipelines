@@ -32,12 +32,12 @@ def load_data(database_filepath):
 			Y - the training data set, target values
 			category_names - the name of each target, this will be used to display the evluation result of each target
 	"""
-    engine = create_engine('sqlite:///' + database_filepath) #load sql file
-    df=pd.read_sql_table('DisaterResponse', engine) #extract sql file
-    X = df["message"] #use the message column as input data
-    Y = df.iloc[:,4:] #use the columns after the forth one as target data
-    category_names = list(Y.columns)  #assign the category names
-    return X,Y,category_names
+	engine = create_engine('sqlite:///' + database_filepath) #load sql file
+	df=pd.read_sql_table('DisaterResponse', engine) #extract sql file
+	X = df["message"] #use the message column as input data
+	Y = df.iloc[:,4:] #use the columns after the forth one as target data
+	category_names = list(Y.columns)  #assign the category names
+	return X,Y,category_names
 
 
 def tokenize(text):
@@ -47,16 +47,16 @@ def tokenize(text):
 	input: text - a text string
 	output: words - tokenized text string. a list that contains several individual words strings
 	"""
-    text = text.lower()  # convert the text to lower case
-    text = re.sub(r"[^a-zA-Z0-9]", " ", text)  #remove punctutation
-    words = word_tokenize(text)  #tokenize text
-    words=[x for x in words if x in englishwords and x not in stopwords.words("english")] #remove stop words and non-english words(just in case)
-    wordnet_lemmatizer=WordNetLemmatizer()
-    words = [wordnet_lemmatizer.lemmatize(w, pos='v') for w in words]  # root verb words
-    words = [wordnet_lemmatizer.lemmatize(w, pos='n') for w in words]  # root noun words
-    words = [wordnet_lemmatizer.lemmatize(w, pos='a') for w in words]  # root adj words
-    words = [wordnet_lemmatizer.lemmatize(w, pos='v') for w in words]  # root adv words
-    return words
+	text = text.lower()  # convert the text to lower case
+	text = re.sub(r"[^a-zA-Z0-9]", " ", text)  #remove punctutation
+	words = word_tokenize(text)  #tokenize text
+	words=[x for x in words if x in englishwords and x not in stopwords.words("english")] #remove stop words and non-english words(just in case)
+	wordnet_lemmatizer=WordNetLemmatizer()
+	words = [wordnet_lemmatizer.lemmatize(w, pos='v') for w in words]  # root verb words
+	words = [wordnet_lemmatizer.lemmatize(w, pos='n') for w in words]  # root noun words
+	words = [wordnet_lemmatizer.lemmatize(w, pos='a') for w in words]  # root adj words
+	words = [wordnet_lemmatizer.lemmatize(w, pos='v') for w in words]  # root adv words
+	return words
     
 
 
@@ -66,13 +66,13 @@ def build_model():
 	input: None
 	Output: ML pipeline
 	"""
-    pipeline = Pipeline([
+	pipeline = Pipeline([
 						('vect', CountVectorizer(tokenizer=tokenize)),  # create a countvectorizer using the tokenize function
 						('tfidf', TfidfTransformer()), # create a tfidf transformer
 						('clf', MultiOutputClassifier(RandomForestClassifier(n_estimators=200,min_samples_split=6,criterion='gini'))), # create a randomforesetclassifier
 						])
     
-    return pipeline
+	return pipeline
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
@@ -84,12 +84,12 @@ def evaluate_model(model, X_test, Y_test, category_names):
 		   category_names - a list that contains the names of each target category
 	output: none
 	"""
-    y_pred=model.predict(X_test)
-    col_names=Y_test.columns
-    for i in range(len(col_names)):
-        print("Category:", col_names[i],"\n", classification_report(Y_test.iloc[:, i].values, y_pred[:, i]))
-        print('Accuracy of %s: %.2f \n\n' %(col_names[i], accuracy_score(Y_test.iloc[:, i].values, y_pred[:,i])))
-    pass
+	y_pred=model.predict(X_test)
+	col_names=Y_test.columns
+	for i in range(len(col_names)):
+		print("Category:", col_names[i],"\n", classification_report(Y_test.iloc[:, i].values, y_pred[:, i]))
+		print('Accuracy of %s: %.2f \n\n' %(col_names[i], accuracy_score(Y_test.iloc[:, i].values, y_pred[:,i])))
+	pass
 
 
 def save_model(model, model_filepath):
@@ -98,40 +98,40 @@ def save_model(model, model_filepath):
 	input: model - the trained model
 		   model_filepath - the filepath to store the model
 	"""
-    pickle.dump(model, open(model_filepath, "wb"))
-    pass
+	pickle.dump(model, open(model_filepath, "wb"))
+	pass
 
 
 def main():
 	"""
 	python models/train_classifier.py data/DisasterResponse.db models/classifier.pkl
 	"""
-    if len(sys.argv) == 3:
-        database_filepath, model_filepath = sys.argv[1:]
-        print('Loading data...\n    DATABASE: {}'.format(database_filepath))
-        X, Y, category_names = load_data(database_filepath)
-        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)  #splite the training and testing data
+	if len(sys.argv) == 3:
+		database_filepath, model_filepath = sys.argv[1:]
+		print('Loading data...\n    DATABASE: {}'.format(database_filepath))
+		X, Y, category_names = load_data(database_filepath)
+		X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)  #splite the training and testing data
         
-        print('Building model...')
-        model = build_model()
+		print('Building model...')
+		model = build_model()
         
-        print('Training model...')
-        model.fit(X_train, Y_train)
+		print('Training model...')
+		model.fit(X_train, Y_train)
         
-        print('Evaluating model...')
-        evaluate_model(model, X_test, Y_test, category_names)
+		print('Evaluating model...')
+		evaluate_model(model, X_test, Y_test, category_names)
 
-        print('Saving model...\n    MODEL: {}'.format(model_filepath))
-        save_model(model, model_filepath)
+		print('Saving model...\n    MODEL: {}'.format(model_filepath))
+		save_model(model, model_filepath)
 
-        print('Trained model saved!')
+		print('Trained model saved!')
 
-    else:
-        print('Please provide the filepath of the disaster messages database '\
-              'as the first argument and the filepath of the pickle file to '\
-              'save the model to as the second argument. \n\nExample: python '\
-              'train_classifier.py ../data/DisasterResponse.db classifier.pkl')
+	else:
+		print('Please provide the filepath of the disaster messages database '\
+				'as the first argument and the filepath of the pickle file to '\
+				'save the model to as the second argument. \n\nExample: python '\
+				'train_classifier.py ../data/DisasterResponse.db classifier.pkl')
 
 
 if __name__ == '__main__':
-    main()
+	main()
