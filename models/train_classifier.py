@@ -20,6 +20,7 @@ from sklearn.multioutput import MultiOutputClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.metrics import classification_report, accuracy_score
 from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import precision_recall_fscore_support as score
 import pickle
 
 
@@ -87,7 +88,12 @@ def evaluate_model(model, X_test, Y_test, category_names):
 	y_pred=model.predict(X_test)
 	col_names=Y_test.columns
 	for i in range(len(col_names)):
-		print("Category:", col_names[i],"\n", classification_report(Y_test.iloc[:, i].values, y_pred[:, i]))
+		precision,recall,fscore,support=score(Y_test.iloc[:, i].values,y_pred[:, i],average='weighted')
+		#print("Category:", col_names[i],"\n", classification_report(Y_test.iloc[:, i].values, y_pred[:, i]))
+		print("Category:", col_names[i],"\n")
+		print('Precision of %s: %.2f \n' %(col_names[i], precision))
+		print('Recall of %s: %.2f \n' %(col_names[i], recall))
+		print('F1score of %s: %.2f \n' %(col_names[i], fscore))
 		print('Accuracy of %s: %.2f \n\n' %(col_names[i], accuracy_score(Y_test.iloc[:, i].values, y_pred[:,i])))
 	pass
 
