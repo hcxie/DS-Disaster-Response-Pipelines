@@ -1,7 +1,7 @@
 # Disaster Response Pipeline Project
 
 # Installation
-The require library including: pandas, sqlalchemy, re, pickle, nltk and sklearn. "punck","words","stopwords" and "wordnet"
+The required libraries including: pandas, sqlalchemy, re, pickle, nltk and sklearn. "punck","words","stopwords" and "wordnet"
 
 # Project Motivation
 This is the my fifth project in Udacity Data Science nanedegree.
